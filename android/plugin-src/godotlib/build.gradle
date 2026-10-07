@@ -1,0 +1,4 @@
+// Plain module exposing the godot-lib AAR as its default artifact
+// (AGP forbids direct local .aar deps when building an AAR).
+configurations.maybeCreate("default")
+artifacts.add("default", file('godot-lib.template_release.aar'))
