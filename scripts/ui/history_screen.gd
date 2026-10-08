@@ -43,6 +43,8 @@ func _ready() -> void:
         pv.add_child(UiKit.label(str(h.ts).replace("T", " — "), 13, UiKit.DIM))
         pv.add_child(UiKit.label(str(h.summary), 16, UiKit.INK, false, true))
         inner.add_child(p)
+    # touch-drag anywhere on the page must scroll it (not only the scrollbar)
+    UiKit.scroll_friendly(scroll)
 
     var back := UiKit.ghost_button("بازگشت", 20)
     back.pressed.connect(func(): Sfx.play("click"); closed.emit())

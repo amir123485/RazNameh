@@ -16,6 +16,7 @@ func _ready() -> void:
     test_overall_readings()
     test_history_toggle()
     test_notif_data()
+    test_remote_config()
     print("== done: %d failures ==" % failures)
     if failures == 0:
         print("ALL TESTS PASSED")
@@ -163,3 +164,34 @@ func test_notif_data() -> void:
         uniq[m] = true
     check(uniq.size() == msgs.size(), "notification messages unique")
     check(Notif.plugin == null, "notif plugin inert on desktop")
+
+# --------------------------------------------- remote config + vendor (v1.2)
+func test_remote_config() -> void:
+    print("- remote config (global tariffs)")
+    # default pin migrated to the new passphrase
+    check(Save.admin_pin == "@Mir1383123485", "admin pin default")
+    # flavor present (test flavor in this repo state)
+    check(Rates.vendor() in ["test", "bazaar", "myket"], "vendor flavor domain")
+    check(Rates.vendor() == "test", "test flavor until re-flavored")
+    # apply a simulated remote file: allowed keys, unknown keys, _keys, empties
+    var sample := "{\"_note\":\"x\",\"price_tarot6\":120,\"price_hafez\":\"18\",\"ad_reward\":\"\",\"vendor\":\"bazaar\",\"pack_2_price\":40000}"
+    check(Rates._apply_remote(sample), "remote json parses")
+    check(Save.remote.get("price_tarot6", 0) == 120, "remote int applied")
+    check(Save.remote.get("price_hafez", "") == "18", "remote numeric string kept")
+    check(not Save.remote.has("ad_reward"), "remote empty value skipped")
+    check(not Save.remote.has("vendor"), "vendor not remotely settable")
+    check(Save.remote.size() == 3, "whitelist enforced")
+    check(Rates.price("tarot6") == 120, "remote reaches price()")
+    # local admin override beats remote
+    Rates.set_override("price_tarot6", 90)
+    check(Rates.price("tarot6") == 90, "local override beats remote")
+    Rates.reset_overrides()
+    check(Rates.price("tarot6") == 120, "remote again after reset")
+    # malformed json rejected
+    check(not Rates._apply_remote("not json"), "malformed remote rejected")
+    # cleanup so UI flows use defaults
+    Save.remote = {}
+    Save.remote_ts = ""
+    Save.overrides = {}
+    Save.save_all()
+    check(Rates.price("tarot6") == 75, "cleanup restores default")

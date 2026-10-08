@@ -210,6 +210,8 @@ func _show_result(result: Dictionary) -> void:
     if str(result.get("footer", "")) != "":
         inner.add_child(UiKit.label(str(result.footer), 17, UiKit.GOLD))
     inner.add_child(UiKit.label("این فال صرفاً جنبهٔ سرگرمی و الهام‌بخشی دارد و توصیهٔ واقعی نیست.", 13, UiKit.DIM, false, true))
+    # touch-drag anywhere on the page must scroll it (not only the scrollbar)
+    UiKit.scroll_friendly(scroll)
 
     var done := UiKit.button("پایان و ذخیره ✦", 22)
     done.custom_minimum_size.y = 64

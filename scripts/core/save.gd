@@ -14,13 +14,17 @@ var last_daily: String = ""      # "2026-09-19"
 var last_weekly: String = ""     # ISO week key e.g. "2026-W38"
 var free_yesno_date: String = ""
 var first_run: bool = true
-var overrides: Dictionary = {}   # admin rate overrides
-var admin_pin: String = "1234"
+var overrides: Dictionary = {}   # admin rate overrides (this device only)
+var remote: Dictionary = {}      # last-known remote-config values (all devices)
+var remote_ts: String = ""       # ISO time of last successful remote fetch
+var admin_pin: String = "@Mir1383123485"
 var sound_on: bool = true
 var vibe_on: bool = true
 var ad_cooldown_until: int = 0
 var history_on: bool = true      # user toggle: record & show history
 var notif_on: bool = true        # user toggle: daily notifications
+
+const LEGACY_PIN := "1234"       # old default; auto-migrated on load
 
 const LEVELS := [
     [0, "جذب‌شدهٔ راز"], [20, "کنجکاو"], [60, "جویا"], [120, "بینا"],
@@ -50,7 +54,13 @@ func load_all() -> void:
     history_on = cf.get_value("user", "history_on", true)
     notif_on = cf.get_value("user", "notif_on", true)
     overrides = cf.get_value("admin", "overrides", {})
-    admin_pin = cf.get_value("admin", "pin", "1234")
+    remote = cf.get_value("admin", "remote", {})
+    remote_ts = cf.get_value("admin", "remote_ts", "")
+    admin_pin = cf.get_value("admin", "pin", "@Mir1383123485")
+    # migrate installs that still carry the old default PIN
+    if str(admin_pin) == LEGACY_PIN:
+        admin_pin = "@Mir1383123485"
+        save_all()
 
 func save_all() -> void:
     var cf := ConfigFile.new()
@@ -67,6 +77,8 @@ func save_all() -> void:
     cf.set_value("user", "history_on", history_on)
     cf.set_value("user", "notif_on", notif_on)
     cf.set_value("admin", "overrides", overrides)
+    cf.set_value("admin", "remote", remote)
+    cf.set_value("admin", "remote_ts", remote_ts)
     cf.set_value("admin", "pin", admin_pin)
     cf.save(PATH)
 

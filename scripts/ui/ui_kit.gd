@@ -99,6 +99,21 @@ static func hspacer() -> Control:
     c.mouse_filter = Control.MOUSE_FILTER_IGNORE
     return c
 
+## Make touch-drag scroll work from anywhere inside a ScrollContainer.
+## Godot gives the touch to the topmost STOP control (panels!) which then
+## eats the drag, so the page only scrolled via the scrollbar thumb.
+## Everything non-interactive becomes MOUSE_FILTER_IGNORE so the drag
+## falls through to the ScrollContainer itself. Buttons / LineEdits /
+## sliders keep working (they stay interactive).
+static func scroll_friendly(root: Node) -> void:
+    for c in root.get_children():
+        if c is Control:
+            var interactive := (c is Button) or (c is LineEdit) \
+                or (c is Slider) or (c is ScrollBar)
+            if not interactive:
+                c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        scroll_friendly(c)
+
 static func fa(n) -> String:
     return Rates.fa_num(n)
 
