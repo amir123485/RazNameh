@@ -85,8 +85,8 @@ func _ready() -> void:
     av.add_theme_constant_override("separation", 6)
     about.add_child(av)
     av.add_child(UiKit.label("دربارهٔ رازنامه", 21, UiKit.GOLD, true))
-    av.add_child(UiKit.label("رازنامه یک اپ سرگرمی فال و تاروت است.\nنسخهٔ " + UiKit.fa("1.2.0") + " — ساخته‌شده با Godot 4.7\n\n⚠ همهٔ فال‌ها جنبهٔ سرگرمی و الهام‌بخشی دارند و هیچ توصیهٔ واقعی، طبی، مالی یا عاطفی‌ای نیستند.", 16, UiKit.INK, false, true))
-    var ver := UiKit.label("v1.2.0", 13, UiKit.DIM)
+    av.add_child(UiKit.label("رازنامه یک اپ سرگرمی فال و تاروت است.\nنسخهٔ " + UiKit.fa("1.3.0") + " — ساخته‌شده با Godot 4.7\n\n⚠ همهٔ فال‌ها جنبهٔ سرگرمی و الهام‌بخشی دارند و هیچ توصیهٔ واقعی، طبی، مالی یا عاطفی‌ای نیستند.", 16, UiKit.INK, false, true))
+    var ver := UiKit.label("v1.3.0", 13, UiKit.DIM)
     ver.name = "VersionLabel"
     av.add_child(ver)
     ver.mouse_filter = Control.MOUSE_FILTER_STOP

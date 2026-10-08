@@ -23,4 +23,8 @@ android {
 
 dependencies {
     implementation project(':godotlib')
+    // Tapsell Mediation (rewarded video) — compileOnly: the APP gradle
+    // template (android/build/app/build.gradle) carries the real maven
+    // dependency so transitive libs resolve there and stay out of the AAR.
+    compileOnly 'ir.tapsell:tapsell:1.3.0'
 }

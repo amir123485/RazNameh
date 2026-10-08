@@ -13,6 +13,11 @@ import android.os.RemoteException;
 
 import com.android.vending.billing.IInAppBillingService;
 
+import ir.tapsell.mediation.Tapsell;
+import ir.tapsell.mediation.ad.AdStateListener;
+import ir.tapsell.mediation.ad.request.RequestResultListener;
+import ir.tapsell.mediation.ad.show.AdShowCompletionState;
+
 import org.godotengine.godot.Godot;
 import org.godotengine.godot.plugin.GodotPlugin;
 import org.godotengine.godot.plugin.SignalInfo;
@@ -67,6 +72,8 @@ public class IrServicesPlugin extends GodotPlugin {
         signals.add(new SignalInfo("billing_ready", Boolean.class));
         signals.add(new SignalInfo("purchase_done", String.class));
         signals.add(new SignalInfo("purchase_failed", String.class));
+        signals.add(new SignalInfo("ad_rewarded", Integer.class));
+        signals.add(new SignalInfo("ad_failed", String.class));
         return signals;
     }
 
@@ -160,6 +167,90 @@ public class IrServicesPlugin extends GodotPlugin {
                 }
             });
         }
+    }
+
+    // ------------------------------------------------------ Tapsell rewarded
+    // Flow: requestRewardedAd(zone) -> onSuccess(adId) -> showRewardedAd(adId)
+    // The Tapsell APPLICATION_KEY is baked into the merged manifest
+    // (meta-data ir.tapsell.mediation.APPLICATION_KEY) by the app gradle
+    // template; `appKey` from GDScript is kept for future runtime use.
+
+    private volatile String pendingAdId = null;
+    private volatile boolean adRewarded = false;
+
+    @UsedByGodot
+    public void show_rewarded_ad(final String appKey, final String zoneId) {
+        final Activity activity = godot.getActivity();
+        if (activity == null) {
+            emitSignal("ad_failed", "\u062e\u0637\u0627\u06cc \u062f\u0627\u062e\u0644\u06cc"); // "خطای داخلی"
+            return;
+        }
+        if (zoneId == null || zoneId.trim().isEmpty()) {
+            emitSignal("ad_failed", "\u0648\u0627\u062d\u062f \u062a\u0628\u0644\u06cc\u063a \u0646\u0627\u0645\u0639\u062a\u0628\u0631"); // "واحد تبلیغ نامعتبر"
+            return;
+        }
+        adRewarded = false;
+        try {
+            Tapsell.requestRewardedAd(zoneId.trim(), new RequestResultListener() {
+                @Override
+                public void onSuccess(final String adId) {
+                    pendingAdId = adId;
+                    try {
+                        Tapsell.showRewardedAd(adId, activity, new AdStateListener.Rewarded() {
+                            @Override
+                            public void onAdClosed(AdShowCompletionState state) {
+                                pendingAdId = null;
+                                if (!adRewarded) {
+                                    String st = "UNKNOWN";
+                                    try { st = state != null ? state.name() : st; } catch (Throwable ignored) {}
+                                    emitSignal("ad_failed", "CLOSED_" + st);
+                                }
+                            }
+
+                            @Override
+                            public void onAdImpression() {
+                            }
+
+                            @Override
+                            public void onAdClicked() {
+                            }
+
+                            @Override
+                            public void onRewarded() {
+                                adRewarded = true;
+                                emitSignal("ad_rewarded", Integer.valueOf(0));
+                            }
+
+                            @Override
+                            public void onAdFailed(String message) {
+                                pendingAdId = null;
+                                if (!adRewarded) {
+                                    emitSignal("ad_failed", message == null ? "AD_FAILED" : message);
+                                }
+                            }
+                        });
+                    } catch (Throwable t) {
+                        pendingAdId = null;
+                        if (!adRewarded) {
+                            emitSignal("ad_failed", "SHOW:" + t.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(final String message) {
+                    pendingAdId = null;
+                    emitSignal("ad_failed", message == null ? "REQUEST_FAILED" : message);
+                }
+            });
+        } catch (Throwable t) {
+            emitSignal("ad_failed", "TAPSELL:" + t.getMessage());
+        }
+    }
+
+    @UsedByGodot
+    public boolean tapsell_busy() {
+        return pendingAdId != null;
     }
 
     // ------------------------------------------------------ notifications

@@ -21,6 +21,13 @@ func _ready() -> void:
     add_child(screen_holder)
     _build_bottom_bar()
     Sfx.ambient_on()
+    # Ad feedback (real Tapsell path can fail silently without these)
+    Ads.ad_reward.connect(func(c: int): _toast("🎬 تبلیغ کامل شد! +" + UiKit.fa(c) + " سکه"))
+    Ads.ad_failed.connect(func(r: String):
+        if str(r).begins_with("CLOSED_"):
+            _toast("تبلیغ نیمه‌کاره رها شد؛ سکه‌ای تعلق نگرفت")
+        else:
+            _toast("تبلیغ الان در دسترس نیست؛ چند لحظهٔ دیگر امتحان کن"))
     print("TOUR DBG: main ready, user args=", OS.get_cmdline_user_args())
     goto_home()
     if Save.first_run:

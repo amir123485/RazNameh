@@ -29,3 +29,8 @@ class AndroidExportPlugin extends EditorExportPlugin:
 
     func _get_android_libraries(platform, debug: bool) -> PackedStringArray:
         return PackedStringArray(["IrServices/IrServicesPlugin.aar"])
+
+    ## Tapsell Mediation SDK (rewarded video) — resolved by the gradle
+    ## build from Maven Central so all transitive libs are included.
+    func _get_android_dependencies(platform, debug: bool) -> PackedStringArray:
+        return PackedStringArray(["ir.tapsell:tapsell:1.3.0"])
