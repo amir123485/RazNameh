@@ -1,6 +1,6 @@
 9cad1ddce9e5a63143ba340c9520626b
-::res://::1791431770
-export_presets.cfg::TextFile::-1::1791430946::0::1::::<><><>0<>0<><>::
+::res://::1791433286
+export_presets.cfg::TextFile::-1::1791433286::0::1::::<><><>0<>0<><>::
 README_RazNameh.md::TextFile::-1::1791429943::0::1::::<><><>0<>0<><>::
 ::res://addons/::1791429943
 ::res://addons/IrServices/::1791429943
@@ -38,7 +38,7 @@ notify_msgs.json::JSON::-1::1791430878::0::1::::<><><>0<>0<><>::
 pastor_cards.json::JSON::-1::1791429944::0::1::::<><><>0<>0<><>::
 tarot_major.json::JSON::-1::1791429944::0::1::::<><><>0<>0<><>::
 tarot_minor.json::JSON::-1::1791429944::0::1::::<><><>0<>0<><>::
-vendor.json::JSON::-1::1791433009::0::1::::<><><>0<>0<><>::
+vendor.json::JSON::-1::1791433324::0::1::::<><><>0<>0<><>::
 ::res://scenes/::1791429944
 main.tscn::PackedScene::-1::1791429944::0::1::::<><><>0<>0<><>::res://scripts/ui/main.gd
 ::res://scripts/::1791429944
