@@ -91,8 +91,8 @@ func _draw_symbol(sym: Dictionary, pos: Vector2, a: float) -> void:
             pts.append(pos + Vector2(arr[i] * 1.6, arr[i + 1] * 1.6))
         draw_polyline(pts, col, 3.0, true)
     if a > 0.9:
-        draw_string(UiKit.font(true), Vector2(pos.x - 80, pos.y + 42), str(sym.name),
-            HORIZONTAL_ALIGNMENT_CENTER, 160, 15, Color(UiKit.GOLD.r, UiKit.GOLD.g, UiKit.GOLD.b, a))
+        draw_string(UiKit.font(true), Vector2(pos.x - 100, pos.y + 48), str(sym.name),
+            HORIZONTAL_ALIGNMENT_CENTER, 200, 19, Color(UiKit.GOLD.r, UiKit.GOLD.g, UiKit.GOLD.b, a))
 
 func _emit_result() -> void:
     if symbols.is_empty():
@@ -106,5 +106,6 @@ func _emit_result() -> void:
         "title": "فال قهوه — " + UiKit.fa(symbols.size()) + " نماد",
         "items": items,
         "summary": summary.strip_edges(),
+        "overall": Fortunes.overall_coffee(symbols),
         "footer": "نمادها، بذرِ فکرند؛ معنایش را قلبِ تو می‌دانست."
     })

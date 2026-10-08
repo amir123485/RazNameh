@@ -162,6 +162,36 @@ public class IrServicesPlugin extends GodotPlugin {
         }
     }
 
+    // ------------------------------------------------------ notifications
+
+    /** Creates the notification channel (no-op below Android 8). */
+    @UsedByGodot
+    public void ensure_notif_channel() {
+        NotifHelper.ensureChannel(ctx);
+    }
+
+    /** Schedules 2 daily notifications; msgs joined with \u0001 separator. */
+    @UsedByGodot
+    public void schedule_daily_notifs(final int h1, final int m1, final int h2, final int m2, final String msgs) {
+        NotifHelper.schedule(ctx, h1, m1, h2, m2, msgs);
+    }
+
+    /** Cancels alarms + shown notifications and disables future ones. */
+    @UsedByGodot
+    public void cancel_notifs() {
+        NotifHelper.cancel(ctx);
+    }
+
+    /** Requests POST_NOTIFICATIONS runtime permission (Android 13+). */
+    @UsedByGodot
+    public void request_notif_permission() {
+        final Activity activity = godot.getActivity();
+        if (activity == null) return;
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            activity.requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 77177);
+        }
+    }
+
     // Called by the engine on the main thread when a started activity returns.
     public void onMainActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != REQUEST_PURCHASE) {

@@ -11,7 +11,7 @@ func _ready() -> void:
     set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     var v := VBoxContainer.new()
     v.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-    v.custom_minimum_size = Vector2(520, 0)
+    v.custom_minimum_size = Vector2(640, 0)
     v.grow_horizontal = Control.GROW_DIRECTION_BOTH
     v.grow_vertical = Control.GROW_DIRECTION_BOTH
     v.add_theme_constant_override("separation", 14)
@@ -47,7 +47,7 @@ func _ready() -> void:
 
 func _key(txt: String) -> Button:
     var b := UiKit.button(txt, 24, UiKit.PANEL2)
-    b.custom_minimum_size = Vector2(120, 72)
+    b.custom_minimum_size = Vector2(154, 92)
     b.pressed.connect(func():
         Sfx.play("click")
         if txt == "⌫":

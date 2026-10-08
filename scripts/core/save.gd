@@ -5,6 +5,7 @@ const PATH := "user://raznameh.cfg"
 
 signal coins_changed(value: int)
 signal xp_changed(xp: int, level: int, title: String)
+signal history_toggled(on: bool)
 
 var coins: int = 12
 var xp: int = 0
@@ -18,6 +19,8 @@ var admin_pin: String = "1234"
 var sound_on: bool = true
 var vibe_on: bool = true
 var ad_cooldown_until: int = 0
+var history_on: bool = true      # user toggle: record & show history
+var notif_on: bool = true        # user toggle: daily notifications
 
 const LEVELS := [
     [0, "جذب‌شدهٔ راز"], [20, "کنجکاو"], [60, "جویا"], [120, "بینا"],
@@ -44,6 +47,8 @@ func load_all() -> void:
     sound_on = cf.get_value("user", "sound_on", true)
     vibe_on = cf.get_value("user", "vibe_on", true)
     ad_cooldown_until = int(cf.get_value("user", "ad_cooldown_until", 0))
+    history_on = cf.get_value("user", "history_on", true)
+    notif_on = cf.get_value("user", "notif_on", true)
     overrides = cf.get_value("admin", "overrides", {})
     admin_pin = cf.get_value("admin", "pin", "1234")
 
@@ -59,6 +64,8 @@ func save_all() -> void:
     cf.set_value("user", "sound_on", sound_on)
     cf.set_value("user", "vibe_on", vibe_on)
     cf.set_value("user", "ad_cooldown_until", ad_cooldown_until)
+    cf.set_value("user", "history_on", history_on)
+    cf.set_value("user", "notif_on", notif_on)
     cf.set_value("admin", "overrides", overrides)
     cf.set_value("admin", "pin", admin_pin)
     cf.save(PATH)
@@ -95,7 +102,18 @@ func level_title() -> String:
     return LEVELS[idx][1]
 
 # ------------------------------------------------------------ history
+func set_history_on(on: bool) -> void:
+    if history_on == on:
+        return
+    history_on = on
+    if not on:
+        history.clear()   # privacy: erase stored readings when disabled
+    save_all()
+    history_toggled.emit(on)
+
 func add_history(fortune_type: String, title: String, summary: String) -> void:
+    if not history_on:
+        return
     var item := {
         "type": fortune_type,
         "ts": Time.get_datetime_string_from_system(false, true),

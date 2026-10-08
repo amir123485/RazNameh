@@ -13,6 +13,12 @@ const GOOD := Color("7fc98f")
 const BAD := Color("c97f7f")
 const LINE := Color("3a3160")
 
+## Global UI scale (user feedback: everything was too small → +30%).
+const SCALE := 1.3
+
+static func fs(size: int) -> int:
+    return int(round(size * SCALE))
+
 static func font(bold: bool = false, size: int = 22) -> FontFile:
     var path := "res://assets/fonts/vazir/Vazirmatn-Bold.ttf" if bold else "res://assets/fonts/vazir/Vazirmatn-Regular.ttf"
     if not ResourceLoader.exists(path):
@@ -28,7 +34,7 @@ static func label(text: String, size: int = 22, color: Color = INK, bold: bool =
     var l := Label.new()
     l.text = text
     l.add_theme_font_override("font", font(bold))
-    l.add_theme_font_size_override("font_size", size)
+    l.add_theme_font_size_override("font_size", fs(size))
     l.add_theme_color_override("font_color", color)
     l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     if wrap:
@@ -45,10 +51,10 @@ static func panel_style(bg: Color = PANEL, radius: int = 18, border: Color = LIN
     sb.border_width_top = 1
     sb.border_width_bottom = 1
     sb.border_color = border
-    sb.content_margin_left = 14
-    sb.content_margin_right = 14
-    sb.content_margin_top = 10
-    sb.content_margin_bottom = 10
+    sb.content_margin_left = 18
+    sb.content_margin_right = 18
+    sb.content_margin_top = 13
+    sb.content_margin_bottom = 13
     return sb
 
 static func button(text: String, size: int = 22, accent: Color = GOLD, dark_text: bool = false) -> Button:
@@ -56,21 +62,21 @@ static func button(text: String, size: int = 22, accent: Color = GOLD, dark_text
     b.text = text
     b.focus_mode = Control.FOCUS_NONE
     b.add_theme_font_override("font", font(true))
-    b.add_theme_font_size_override("font_size", size)
+    b.add_theme_font_size_override("font_size", fs(size))
     var fg := BG if dark_text else INK
     b.add_theme_color_override("font_color", fg)
     b.add_theme_color_override("font_pressed_color", fg)
     b.add_theme_color_override("font_hover_color", fg)
     b.add_theme_color_override("font_disabled_color", DIM)
-    var sb := panel_style(accent, 14, accent)
-    sb.content_margin_top = 12
-    sb.content_margin_bottom = 12
-    var sb2 := panel_style(accent.lightened(0.12), 14, accent)
-    sb2.content_margin_top = 12
-    sb2.content_margin_bottom = 12
-    var sb3 := panel_style(PANEL2, 14, LINE)
-    sb3.content_margin_top = 12
-    sb3.content_margin_bottom = 12
+    var sb := panel_style(accent, 16, accent)
+    sb.content_margin_top = 16
+    sb.content_margin_bottom = 16
+    var sb2 := panel_style(accent.lightened(0.12), 16, accent)
+    sb2.content_margin_top = 16
+    sb2.content_margin_bottom = 16
+    var sb3 := panel_style(PANEL2, 16, LINE)
+    sb3.content_margin_top = 16
+    sb3.content_margin_bottom = 16
     b.add_theme_stylebox_override("normal", sb)
     b.add_theme_stylebox_override("hover", sb2)
     b.add_theme_stylebox_override("pressed", sb2)

@@ -22,26 +22,26 @@ func _ready() -> void:
     _intro(count)
 
 func _layout(count: int) -> void:
-    var cs := Vector2(150, 232)
+    var cs := Vector2(186, 288)
     if count == 6:
-        cs = Vector2(128, 198)
+        cs = Vector2(158, 244)
     positions.clear()
     var cx := 360.0
-    var cy := 380.0
+    var cy := 400.0
     if count == 1:
         positions.append(Vector2(cx - cs.x / 2, cy - cs.y / 2))
     elif count == 3:
-        var gap := 18
+        var gap := 14
         var total := cs.x * 3 + gap * 2
         var x0 := 360 - total / 2
         for i in range(3):
             positions.append(Vector2(x0 + i * (cs.x + gap), cy - cs.y / 2))
     else:
-        var rx := 230
+        var rx := 238
         var ry := 240
         for i in range(6):
             var ang := -PI / 2 + TAU * i / 6.0
-            positions.append(Vector2(cx + cos(ang) * rx - cs.x / 2, cy + 30 + sin(ang) * ry - cs.y / 2))
+            positions.append(Vector2(cx + cos(ang) * rx - cs.x / 2, cy + 40 + sin(ang) * ry - cs.y / 2))
     for i in range(count):
         var cv := preload("res://scripts/ui/card_view.gd").new()
         cv.setup(cards[i], cs)
@@ -59,17 +59,17 @@ func _intro(count: int) -> void:
     add_child(l)
     # deck at bottom
     var deck := UiKit.panel(UiKit.PANEL2)
-    deck.custom_minimum_size = Vector2(190, 120)
+    deck.custom_minimum_size = Vector2(240, 150)
     deck.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-    deck.offset_top = -190
-    deck.offset_bottom = -70
-    deck.offset_left = -95
-    deck.offset_right = 95
+    deck.offset_top = -230
+    deck.offset_bottom = -80
+    deck.offset_left = -120
+    deck.offset_right = 120
     deck.grow_horizontal = Control.GROW_DIRECTION_BOTH
     var dv := VBoxContainer.new()
     dv.alignment = BoxContainer.ALIGNMENT_CENTER
     deck.add_child(dv)
-    dv.add_child(UiKit.label("✶", 30, UiKit.GOLD))
+    dv.add_child(UiKit.label("✶", 36, UiKit.GOLD))
     dv.add_child(UiKit.label("برای کشیدن، لمس کن", 17, UiKit.DIM))
     add_child(deck)
     deck.name = "Deck"
@@ -122,8 +122,8 @@ func _emit_result() -> void:
         yn = Fortunes.yesno_from_cards(cards)
         var big := UiKit.label("جوابِ نیت: " + yn, 40, UiKit.GOOD if yn == "بله" else (UiKit.BAD if yn == "خیر" else UiKit.DIM), true)
         big.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-        big.offset_top = -230
-        big.offset_bottom = -160
+        big.offset_top = -260
+        big.offset_bottom = -180
         add_child(big)
         Sfx.vibe(40)
     if mode == "tarot3":
@@ -139,11 +139,13 @@ func _emit_result() -> void:
     var items := []
     var title := ""
     var summary := ""
+    var overall := ""
     if mode == "yesno":
         title = "نیت بله و خیر"
         var c: Dictionary = cards[0]
         items.append({"head": yn + " — " + c.name, "sub": c.keywords, "body": c.meaning})
         summary = yn + " (" + c.name + ")"
+        overall = Fortunes.overall_yesno(cards, yn)
     else:
         var names: Array = ["گذشته", "حال", "آینده"] if mode == "tarot3" else ["وضعیت", "مانع", "راهنما", "پنهان", "توصیه", "نتیجه"]
         title = "تاروت " + UiKit.fa(cards.size()) + " کارتی"
@@ -154,7 +156,8 @@ func _emit_result() -> void:
         for c2 in cards:
             names_arr.append(str(c2.name))
         summary = ", ".join(names_arr)
-    result_ready.emit({"title": title, "items": items, "summary": summary, "footer": ""})
+        overall = Fortunes.overall_tarot(cards, names)
+    result_ready.emit({"title": title, "items": items, "summary": summary, "overall": overall, "footer": ""})
 
 class LineDrawer extends Control:
     var card_views: Array = []

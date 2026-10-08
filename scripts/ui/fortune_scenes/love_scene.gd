@@ -56,8 +56,8 @@ func _draw() -> void:
         _heart(c, 60 * beat * ma, Color(0.9, 0.3, 0.45, ma))
     if merge >= 1.0:
         var f := UiKit.font(true)
-        draw_string(f, Vector2(0, c.y + 130), "سازگاری: " + UiKit.fa(shown_pct) + "٪",
-            HORIZONTAL_ALIGNMENT_CENTER, 720, 34, UiKit.GOLD)
+        draw_string(f, Vector2(0, c.y + 140), "سازگاری: " + UiKit.fa(shown_pct) + "٪",
+            HORIZONTAL_ALIGNMENT_CENTER, 720, 42, UiKit.GOLD)
 
 func _heart(pos: Vector2, r: float, col: Color) -> void:
     var pts := PackedVector2Array()
@@ -82,5 +82,6 @@ func _emit() -> void:
             {"head": "سطرِ حافظ", "sub": "", "body": str(data.poem)}
         ],
         "summary": "سازگاری " + UiKit.fa(pct) + "٪",
+        "overall": Fortunes.overall_love(data),
         "footer": "عشق را عدد نسنجد؛ عدد فقط بادی است که پرچم را نشان می‌دهد."
     })

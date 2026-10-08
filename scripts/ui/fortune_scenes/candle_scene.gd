@@ -66,15 +66,21 @@ func _show_result() -> void:
     _result_shown = true
     var kind: String = "شعلهٔ روشن" 
     var items := [{"head": "✦ " + str(interp.t), "sub": "زبانِ شعله", "body": str(interp.m)}]
-    var polarity := "میانه"
+    var polarity := "mid"
     if interp in Fortunes.candle.good:
-        polarity = "خوش‌یُمن"
+        polarity = "good"
     elif interp in Fortunes.candle.bad:
-        polarity = "نیاز به احتیاط"
+        polarity = "bad"
+    var polarity_fa := "میانه"
+    if polarity == "good":
+        polarity_fa = "خوش‌یُمن"
+    elif polarity == "bad":
+        polarity_fa = "نیاز به احتیاط"
     result_ready.emit({
-        "title": "فال شمع — " + polarity,
+        "title": "فال شمع — " + polarity_fa,
         "items": items,
         "summary": str(interp.t),
+        "overall": Fortunes.overall_candle(interp, polarity),
         "footer": "شمع باد را می‌شناسد؛ نیتِ آرام، شعلهٔ پایدارتر."
     })
 

@@ -59,8 +59,8 @@ func _ready() -> void:
     # ---- grid
     var grid := GridContainer.new()
     grid.columns = 2
-    grid.add_theme_constant_override("h_separation", 12)
-    grid.add_theme_constant_override("v_separation", 12)
+    grid.add_theme_constant_override("h_separation", 10)
+    grid.add_theme_constant_override("v_separation", 10)
     grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
     v.add_child(grid)
     for f in FORTUNES:
@@ -101,12 +101,12 @@ func _claim_weekly() -> void:
 
 func _fortune_card(f: Dictionary) -> Control:
     var p := UiKit.panel(UiKit.PANEL)
-    p.custom_minimum_size = Vector2(320, 150)
+    p.custom_minimum_size = Vector2(336, 196)
     var v := VBoxContainer.new()
-    v.add_theme_constant_override("separation", 2)
+    v.add_theme_constant_override("separation", 4)
     v.alignment = BoxContainer.ALIGNMENT_CENTER
     p.add_child(v)
-    var g := UiKit.label(f.g, 40, UiKit.PURPLE)
+    var g := UiKit.label(f.g, 44, UiKit.PURPLE)
     v.add_child(g)
     v.add_child(UiKit.label(f.name, 21, UiKit.INK, true))
     v.add_child(UiKit.label(f.desc, 15, UiKit.DIM))

@@ -56,12 +56,12 @@ func _ready() -> void:
         var row := HBoxContainer.new()
         row.add_theme_constant_override("separation", 10)
         var lab := UiKit.label(str(def[1]), 17)
-        lab.custom_minimum_size.x = 250
+        lab.custom_minimum_size.x = 300
         row.add_child(lab)
         var e := LineEdit.new()
-        e.custom_minimum_size = Vector2(200, 50)
+        e.custom_minimum_size = Vector2(240, 62)
         e.add_theme_font_override("font", UiKit.font())
-        e.add_theme_font_size_override("font_size", 18)
+        e.add_theme_font_size_override("font_size", UiKit.fs(18))
         e.alignment = HORIZONTAL_ALIGNMENT_CENTER
         var cur = Rates.rate(str(def[0]))
         if str(def[0]) == "tapsell_app_key" or str(def[0]) == "tapsell_ad_unit":
@@ -79,8 +79,9 @@ func _ready() -> void:
     vrow.add_theme_constant_override("separation", 10)
     vrow.add_child(UiKit.label("فروشگاه پرداخت", 17))
     var vend := OptionButton.new()
-    vend.custom_minimum_size = Vector2(200, 50)
+    vend.custom_minimum_size = Vector2(240, 62)
     vend.add_theme_font_override("font", UiKit.font())
+    vend.add_theme_font_size_override("font_size", UiKit.fs(18))
     for item in ["test", "bazaar", "myket"]:
         vend.add_item(item)
     vend.select(["test", "bazaar", "myket"].find(Rates.vendor()))
@@ -93,9 +94,10 @@ func _ready() -> void:
     prow.add_theme_constant_override("separation", 10)
     prow.add_child(UiKit.label("رمز جدید پنل", 17))
     var pe := LineEdit.new()
-    pe.custom_minimum_size = Vector2(200, 50)
+    pe.custom_minimum_size = Vector2(240, 62)
     pe.secret = true
     pe.add_theme_font_override("font", UiKit.font())
+    pe.add_theme_font_size_override("font_size", UiKit.fs(18))
     prow.add_child(pe)
     var psave := UiKit.ghost_button("ثبت رمز", 16)
     psave.pressed.connect(func():

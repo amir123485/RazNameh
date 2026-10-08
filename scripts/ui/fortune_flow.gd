@@ -60,13 +60,13 @@ func _build() -> void:
         sv.add_child(UiKit.label("نام تو", 18, UiKit.DIM))
         var e1 := LineEdit.new()
         e1.placeholder_text = "مثلاً آرزو"
-        e1.custom_minimum_size.y = 52
+        e1.custom_minimum_size.y = 68
         _style_edit(e1)
         sv.add_child(e1)
         sv.add_child(UiKit.label("نام آن شخص", 18, UiKit.DIM))
         var e2 := LineEdit.new()
         e2.placeholder_text = "مثلاً سعید"
-        e2.custom_minimum_size.y = 52
+        e2.custom_minimum_size.y = 68
         _style_edit(e2)
         sv.add_child(e2)
         sheet.set_meta("e1", e1)
@@ -76,7 +76,7 @@ func _build() -> void:
         sv.add_child(UiKit.label("نیت", 18, UiKit.DIM))
         var e := LineEdit.new()
         e.placeholder_text = str(meta.intent_ph)
-        e.custom_minimum_size.y = 52
+        e.custom_minimum_size.y = 68
         _style_edit(e)
         sv.add_child(e)
         sheet.set_meta("intent", e)
@@ -88,12 +88,12 @@ func _build() -> void:
     bh.add_theme_constant_override("separation", 10)
     v.add_child(bh)
     var back := UiKit.ghost_button("بازگشت", 20)
-    back.custom_minimum_size.x = 130
+    back.custom_minimum_size.x = 170
     back.pressed.connect(func(): Sfx.play("click"); closed.emit())
     bh.add_child(back)
     bh.add_child(UiKit.hspacer())
     var start := UiKit.button("آغاز فال ✦", 22)
-    start.custom_minimum_size.x = 190
+    start.custom_minimum_size.x = 248
     start.pressed.connect(func(): _on_start(price))
     bh.add_child(start)
 
@@ -115,7 +115,7 @@ func _build() -> void:
 
 func _style_edit(e: LineEdit) -> void:
     e.add_theme_font_override("font", UiKit.font())
-    e.add_theme_font_size_override("font_size", 20)
+    e.add_theme_font_size_override("font_size", UiKit.fs(20))
     var sb := UiKit.panel_style(UiKit.PANEL2, 12, UiKit.LINE)
     e.add_theme_stylebox_override("normal", sb)
     e.add_theme_stylebox_override("focus", UiKit.panel_style(UiKit.PANEL2, 12, UiKit.GOLD))
@@ -191,11 +191,28 @@ func _show_result(result: Dictionary) -> void:
         pv.add_child(UiKit.label(str(item.body), 19, UiKit.INK, false, true))
         inner.add_child(p)
 
+    # overall reading (تفسیر کلی) — highlighted gold-bordered synthesis
+    if str(result.get("overall", "")) != "":
+        var op := PanelContainer.new()
+        var osb := UiKit.panel_style(Color("2b2347"), 18, UiKit.GOLD)
+        osb.border_width_left = 2
+        osb.border_width_right = 2
+        osb.border_width_top = 2
+        osb.border_width_bottom = 2
+        op.add_theme_stylebox_override("panel", osb)
+        var ov := VBoxContainer.new()
+        ov.add_theme_constant_override("separation", 6)
+        op.add_child(ov)
+        ov.add_child(UiKit.label("🧿 تفسیر کلی", 22, UiKit.GOLD, true))
+        ov.add_child(UiKit.label(str(result.overall), 19, UiKit.INK, false, true))
+        inner.add_child(op)
+
     if str(result.get("footer", "")) != "":
         inner.add_child(UiKit.label(str(result.footer), 17, UiKit.GOLD))
     inner.add_child(UiKit.label("این فال صرفاً جنبهٔ سرگرمی و الهام‌بخشی دارد و توصیهٔ واقعی نیست.", 13, UiKit.DIM, false, true))
 
     var done := UiKit.button("پایان و ذخیره ✦", 22)
+    done.custom_minimum_size.y = 64
     done.pressed.connect(func():
         Sfx.play("click")
         finished.emit(fortune_id, str(result.title), str(result.summary))

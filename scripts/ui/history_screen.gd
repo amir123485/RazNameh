@@ -15,6 +15,12 @@ func _ready() -> void:
     add_child(v)
 
     v.add_child(UiKit.label("📜 تاریخچهٔ فال‌ها", 28, UiKit.GOLD, true))
+
+    if not Save.history_on:
+        var off_panel := UiKit.panel(Color("2b2347"))
+        off_panel.add_child(UiKit.label("ثبت تاریخچه در تنظیمات خاموش است؛ فال‌های جدید ذخیره نمی‌شوند.", 18, UiKit.GOLD, false, true))
+        v.add_child(off_panel)
+
     var scroll := ScrollContainer.new()
     scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
     scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

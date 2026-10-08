@@ -4,6 +4,7 @@ extends Control
 var top_bar: Control
 var coin_label: Label
 var level_label: Label
+var hist_btn: Button
 var screen_holder: Control
 var current_screen: Control = null
 var home: Control = null
@@ -14,12 +15,13 @@ func _ready() -> void:
     _build_top_bar()
     screen_holder = Control.new()
     screen_holder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    screen_holder.offset_top = 86
-    screen_holder.offset_bottom = -64
+    screen_holder.offset_top = 108
+    screen_holder.offset_bottom = -84
     screen_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
     add_child(screen_holder)
     _build_bottom_bar()
     Sfx.ambient_on()
+    print("TOUR DBG: main ready, user args=", OS.get_cmdline_user_args())
     goto_home()
     if Save.first_run:
         Save.first_run = false
@@ -38,34 +40,77 @@ func _tour() -> void:
         print("TOUR SHOT: " + name_)
     await get_tree().create_timer(1.2).timeout
     await shot.call("01_home")
-    var steps := [["tarot6", "02_tarot6_deal", 1.0], ["coffee", "03_coffee", 4.2], ["pastor", "03b_pastor", 3.5], ["candle", "04_candle", 2.0], ["hafez", "05_hafez", 5.0], ["love", "06_love", 4.0]]
-    for step in steps:
-        open_fortune(step[0])
-        await get_tree().create_timer(0.4).timeout
-        if current_screen != null and current_screen.has_method("_launch_scene"):
-            current_screen._launch_scene()
-        await get_tree().create_timer(step[1 + 1]).timeout
-        var sc: Control = null
-        if current_screen.get_child_count() > 0:
-            sc = current_screen.get_child(current_screen.get_child_count() - 1)
-        if sc != null:
-            if sc.has_method("_deal"):
-                var deck: Node = sc.get_node_or_null("Deck")
-                if deck != null:
-                    sc._deal(deck)
-                    await get_tree().create_timer(4.5).timeout
-            if sc.has_method("_light"):
-                sc._light()
-                await get_tree().create_timer(3.6).timeout
-            if sc.has_method("_emit") and step[0] == "hafez" and "phase" in sc:
-                sc.phase = 3
-                sc._emit()
-                await get_tree().create_timer(0.4).timeout
-            if sc.has_method("_emit") and step[0] == "love":
-                sc._emit()
-                await get_tree().create_timer(0.4).timeout
-        await shot.call(step[1])
-        await get_tree().create_timer(0.2).timeout
+    # tarot6: deal -> cards+links shot -> auto result (تفسیر کلی) shot
+    open_fortune("tarot6")
+    await get_tree().create_timer(0.4).timeout
+    if is_instance_valid(current_screen) and current_screen.has_method("_launch_scene"):
+        current_screen._launch_scene()
+        await get_tree().create_timer(0.8).timeout
+        var sc: Control = current_screen.get_child(current_screen.get_child_count() - 1) if current_screen.get_child_count() > 0 else null
+        if is_instance_valid(sc) and sc.has_method("_deal"):
+            var deck: Node = sc.get_node_or_null("Deck")
+            if deck != null:
+                sc._deal(deck)
+                await get_tree().create_timer(2.6).timeout
+                await shot.call("02_tarot6_deal")
+                await get_tree().create_timer(1.8).timeout
+                await shot.call("02b_tarot6_result")
+    # coffee
+    open_fortune("coffee")
+    await get_tree().create_timer(0.4).timeout
+    if is_instance_valid(current_screen) and current_screen.has_method("_launch_scene"):
+        current_screen._launch_scene()
+        await get_tree().create_timer(3.6).timeout
+        await shot.call("03_coffee")
+    # pastor: cascade mid-air shot, dealt cards shot, result shot
+    open_fortune("pastor")
+    await get_tree().create_timer(0.4).timeout
+    if is_instance_valid(current_screen) and current_screen.has_method("_launch_scene"):
+        current_screen._launch_scene()
+        await get_tree().create_timer(0.9).timeout
+        await shot.call("03a_pastor_cascade")
+        await get_tree().create_timer(1.7).timeout
+        await shot.call("03b_pastor_cards")
+        await get_tree().create_timer(2.2).timeout
+        await shot.call("03c_pastor_result")
+    # candle
+    open_fortune("candle")
+    await get_tree().create_timer(0.4).timeout
+    if is_instance_valid(current_screen) and current_screen.has_method("_launch_scene"):
+        current_screen._launch_scene()
+        await get_tree().create_timer(0.8).timeout
+        var sc2: Control = current_screen.get_child(current_screen.get_child_count() - 1) if current_screen.get_child_count() > 0 else null
+        if is_instance_valid(sc2) and sc2.has_method("_light"):
+            sc2._light()
+            await get_tree().create_timer(2.0).timeout
+            await shot.call("04_candle")
+            await get_tree().create_timer(1.6).timeout
+            await shot.call("04b_candle_result")
+    # hafez: single page typing shot, then result
+    open_fortune("hafez")
+    await get_tree().create_timer(0.4).timeout
+    if is_instance_valid(current_screen) and current_screen.has_method("_launch_scene"):
+        current_screen._launch_scene()
+        await get_tree().create_timer(2.6).timeout
+        await shot.call("05_hafez_typing")
+        await get_tree().create_timer(3.4).timeout
+        var sc3: Control = current_screen.get_child(current_screen.get_child_count() - 1) if current_screen.get_child_count() > 0 else null
+        if is_instance_valid(sc3) and sc3.has_method("_emit") and "phase" in sc3:
+            sc3.phase = 3
+            sc3._emit()
+            await get_tree().create_timer(0.6).timeout
+            await shot.call("05b_hafez_result")
+    # love
+    open_fortune("love")
+    await get_tree().create_timer(0.4).timeout
+    if is_instance_valid(current_screen) and current_screen.has_method("_launch_scene"):
+        current_screen._launch_scene()
+        await get_tree().create_timer(2.8).timeout
+        var sc4: Control = current_screen.get_child(current_screen.get_child_count() - 1) if current_screen.get_child_count() > 0 else null
+        if is_instance_valid(sc4) and sc4.has_method("_emit"):
+            sc4._emit()
+            await get_tree().create_timer(0.6).timeout
+            await shot.call("06_love")
     open_shop()
     await get_tree().create_timer(0.8).timeout
     await shot.call("07_shop")
@@ -90,61 +135,63 @@ func _build_top_bar() -> void:
     top_bar = PanelContainer.new()
     top_bar.add_theme_stylebox_override("panel", UiKit.panel_style(Color(0.08, 0.06, 0.15, 0.97), 0, UiKit.LINE))
     top_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-    top_bar.offset_bottom = 86
+    top_bar.offset_bottom = 108
     var h := HBoxContainer.new()
-    h.add_theme_constant_override("separation", 10)
+    h.add_theme_constant_override("separation", 8)
     top_bar.add_child(h)
     var title := UiKit.label("✦ رازنامه", 26, UiKit.GOLD, true)
-    title.custom_minimum_size.x = 132
-    title.custom_minimum_size.x = 130
+    title.custom_minimum_size.x = 146
     h.add_child(title)
     h.add_child(UiKit.hspacer())
     var coin_chip := UiKit.panel(UiKit.PANEL2)
     var ch := HBoxContainer.new()
     ch.add_theme_constant_override("separation", 6)
     coin_chip.add_child(ch)
-    coin_label = UiKit.label("🪙 " + UiKit.fa(Save.coins), 22, UiKit.GOLD, true)
+    coin_label = UiKit.label("🪙 " + UiKit.fa(Save.coins), 20, UiKit.GOLD, true)
     ch.add_child(coin_label)
     h.add_child(coin_chip)
     var lvl_chip := UiKit.panel(UiKit.PANEL2)
     var lh := HBoxContainer.new()
     lh.add_theme_constant_override("separation", 6)
     lvl_chip.add_child(lh)
-    level_label = UiKit.label(UiKit.fa(Save.level()) + "· " + Save.level_title(), 18, UiKit.PURPLE, true)
+    level_label = UiKit.label("★ " + UiKit.fa(Save.level()), 20, UiKit.PURPLE, true)
     lh.add_child(level_label)
     h.add_child(lvl_chip)
     h.add_child(UiKit.hspacer())
-    var hist_btn := UiKit.button("تاریخچه", 18, UiKit.PANEL2)
-    hist_btn.custom_minimum_size.x = 108
+    hist_btn = UiKit.button("تاریخچه", 16, UiKit.PANEL2)
+    hist_btn.custom_minimum_size.x = 132
     hist_btn.pressed.connect(func(): Sfx.play("click"); open_history())
     h.add_child(hist_btn)
-    var gear := UiKit.button("تنظیمات", 18, UiKit.PANEL2)
-    gear.custom_minimum_size.x = 108
+    var gear := UiKit.button("تنظیمات", 16, UiKit.PANEL2)
+    gear.custom_minimum_size.x = 132
     gear.pressed.connect(func(): Sfx.play("click"); open_settings())
     h.add_child(gear)
     add_child(top_bar)
     Save.coins_changed.connect(func(v): coin_label.text = "🪙 " + UiKit.fa(v))
-    Save.xp_changed.connect(func(_x, lv, t): level_label.text = UiKit.fa(lv) + "· " + t)
+    Save.xp_changed.connect(func(_x, lv, _t): level_label.text = "★ " + UiKit.fa(lv))
+    Save.history_toggled.connect(func(_on): hist_btn.visible = _on)
+    hist_btn.visible = Save.history_on
 
 func _build_bottom_bar() -> void:
     var bar := PanelContainer.new()
     bar.add_theme_stylebox_override("panel", UiKit.panel_style(Color(0.08, 0.06, 0.15, 0.97), 0, UiKit.LINE))
     bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-    bar.offset_top = -64
+    bar.offset_top = -84
     var h := HBoxContainer.new()
     h.add_theme_constant_override("separation", 10)
     bar.add_child(h)
     var home_btn := UiKit.button("خانه", 20, UiKit.PANEL2)
-    home_btn.custom_minimum_size.x = 110
+    home_btn.custom_minimum_size.x = 144
     home_btn.pressed.connect(func(): Sfx.play("click"); goto_home())
     h.add_child(home_btn)
     h.add_child(UiKit.hspacer())
     var ad_btn := UiKit.button("🎬 تبلیغ ببین +" + UiKit.fa(Rates.rate("ad_reward")), 20, Color("2c5a4e"))
+    ad_btn.custom_minimum_size.x = 236
     ad_btn.pressed.connect(func(): Sfx.play("click"); _watch_ad(ad_btn))
     h.add_child(ad_btn)
     h.add_child(UiKit.hspacer())
     var shop_btn := UiKit.button("🛒 فروشگاه سکه", 20, Color("5a4a2c"))
-    shop_btn.custom_minimum_size.x = 150
+    shop_btn.custom_minimum_size.x = 196
     shop_btn.pressed.connect(func(): Sfx.play("click"); open_shop())
     h.add_child(shop_btn)
     add_child(bar)
@@ -230,7 +277,7 @@ func _show_welcome() -> void:
     add_child(dim)
     var p := UiKit.panel(UiKit.PANEL)
     p.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-    p.custom_minimum_size = Vector2(560, 0)
+    p.custom_minimum_size = Vector2(650, 0)
     p.grow_horizontal = Control.GROW_DIRECTION_BOTH
     p.grow_vertical = Control.GROW_DIRECTION_BOTH
     var v := VBoxContainer.new()

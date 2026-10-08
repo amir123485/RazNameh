@@ -23,7 +23,7 @@ func _ready() -> void:
     add_child(dim)
     var p := UiKit.panel(UiKit.PANEL)
     p.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-    p.custom_minimum_size = Vector2(540, 0)
+    p.custom_minimum_size = Vector2(660, 0)
     p.grow_horizontal = Control.GROW_DIRECTION_BOTH
     p.grow_vertical = Control.GROW_DIRECTION_BOTH
     var v := VBoxContainer.new()

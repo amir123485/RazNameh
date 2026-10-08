@@ -13,6 +13,9 @@ func _ready() -> void:
     test_data_integrity()
     test_admin_override()
     test_ui_kit()
+    test_overall_readings()
+    test_history_toggle()
+    test_notif_data()
     print("== done: %d failures ==" % failures)
     if failures == 0:
         print("ALL TESTS PASSED")
@@ -107,3 +110,56 @@ func test_ui_kit() -> void:
     print("- ui kit")
     check(UiKit.price_tag(0) == "رایگان", "free tag")
     check(UiKit.price_tag(25).contains("۲۵"), "price tag fa digits")
+
+# ------------------------------------------------- overall readings (v1.1)
+func test_overall_readings() -> void:
+    print("- overall readings (tafsir kolli)")
+    # every generator returns a substantial Persian paragraph
+    var t3 := Fortunes.tarot_draw(3)
+    var o1: String = Fortunes.overall_tarot(t3, ["گذشته", "حال", "آینده"])
+    check(o1.length() > 60, "tarot overall length")
+    var yn := Fortunes.yesno_from_cards([Fortunes.tarot_draw(1)[0]])
+    check(Fortunes.overall_yesno([Fortunes.tarot_draw(1)[0]], yn).length() > 40, "yesno overall length")
+    var ps := Fortunes.pastor_draw(3)
+    check(Fortunes.overall_pastor(ps).length() > 60, "pastor overall length")
+    check(Fortunes.overall_coffee(Fortunes.coffee_draw(3)).length() > 60, "coffee overall length")
+    var cd := Fortunes.candle_draw()
+    for pol in ["good", "mid", "bad"]:
+        check(Fortunes.overall_candle(cd, pol).length() > 40, "candle overall " + pol)
+    var hf := Fortunes.hafez_draw()
+    check(Fortunes.overall_hafez(hf).length() > 60, "hafez overall length")
+    for pct in [90, 78, 65]:
+        check(Fortunes.overall_love({"compat": pct}).length() > 40, "love overall " + str(pct))
+    # stability: 30 draws never crash and never empty
+    var ok_all := true
+    for i in range(30):
+        if Fortunes.overall_tarot(Fortunes.tarot_draw(6), ["a","b","c","d","e","f"]).length() < 40:
+            ok_all = false
+    check(ok_all, "30x tarot6 overall stable")
+
+# ------------------------------------------------- history toggle (v1.1)
+func test_history_toggle() -> void:
+    print("- history on/off")
+    var prev: bool = Save.history_on
+    Save.set_history_on(false)
+    check(Save.history_on == false, "history off")
+    var before: int = Save.history.size()
+    Save.add_history("test", "تیتر", "خلاصه")
+    check(Save.history.size() == before, "no recording when off")
+    check(before == 0, "history cleared on off")
+    Save.set_history_on(true)
+    Save.add_history("test", "تیتر", "خلاصه")
+    check(Save.history.size() == 1, "recording when on")
+    Save.history.clear()
+    Save.history_on = prev
+
+# ------------------------------------------------- notification data (v1.1)
+func test_notif_data() -> void:
+    print("- notification data")
+    var msgs: PackedStringArray = Notif.load_msgs()
+    check(msgs.size() >= 24, ">= 24 notification messages")
+    var uniq := {}
+    for m in msgs:
+        uniq[m] = true
+    check(uniq.size() == msgs.size(), "notification messages unique")
+    check(Notif.plugin == null, "notif plugin inert on desktop")

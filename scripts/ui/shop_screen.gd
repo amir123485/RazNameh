@@ -35,7 +35,7 @@ func _ready() -> void:
         h.add_theme_constant_override("separation", 12)
         card.add_child(h)
         var g := UiKit.label(p.g, 30, UiKit.GOLD)
-        g.custom_minimum_size.x = 120
+        g.custom_minimum_size.x = 150
         h.add_child(g)
         var tv := VBoxContainer.new()
         tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -44,7 +44,7 @@ func _ready() -> void:
         tv.add_child(UiKit.label(str(p.tag), 16, UiKit.PURPLE))
         h.add_child(tv)
         var buy := UiKit.button(Rates.fa_price(price) + " تومان", 20)
-        buy.custom_minimum_size.x = 170
+        buy.custom_minimum_size.x = 224
         buy.pressed.connect(func(): _buy(p.key, coins, price))
         h.add_child(buy)
         v.add_child(card)
